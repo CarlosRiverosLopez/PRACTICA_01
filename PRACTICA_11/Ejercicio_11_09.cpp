@@ -12,39 +12,36 @@ convierte en D, B en E, etc.). */
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <sstream>
 
 using namespace std;
 
-void contarContenidoArchivo(const string& nombreArchivo) {
-    ifstream archivo(nombreArchivo);
-    string linea;
-    int numLineas = 0, numPalabras = 0, numCaracteres = 0;
-
-    if (archivo.is_open()) {
-        while (getline(archivo, linea)) {
-            numLineas++;  
-            numCaracteres += linea.length();  // Sumamos la cantidad de caracteres de la línea
-
-            // Usamos un stringstream para contar las palabras en la línea
-            stringstream ss(linea);
-            string palabra;
-            while (ss >> palabra) {
-                numPalabras++;  
-            }
-        }
-        archivo.close();
-        cout << "Número total de líneas: " << numLineas << endl;
-        cout << "Número total de palabras: " << numPalabras << endl;
-        cout << "Número total de caracteres: " << numCaracteres << endl;
-    } else {
-        cout << "No se pudo abrir el archivo: " << nombreArchivo << endl;
+// Función para cifrar el texto usando el cifrado César con desplazamiento de 3
+char cifrarCaracter(char c, int desplazamiento) {
+    if (isalpha(c)) {
+        // Verificamos si el carácter es una letra mayúscula o minúscula
+        char base = (isupper(c)) ? 'A' : 'a';
+        return (c - base + desplazamiento) % 26 + base; 
     }
+    return c; 
 }
 
-int main() {
-    string archivo = "documento.txt";  
-    contarContenidoArchivo(archivo);
+// Función para cifrar el contenido de un archivo
+void cifrarArchivo(const string& archivoEntrada, const string& archivoSalida, int desplazamiento) {
+    ifstream archivoLeer(archivoEntrada);
+    ofstream archivoEscribir(archivoSalida);
+    string linea;
 
-    return 0;
+    if (archivoLeer.is_open() && archivoEscribir.is_open()) {
+        while (getline(archivoLeer, linea)) {
+            for (char& c : linea) {
+                c = cifrarCaracter(c, desplazamiento);  
+            }
+            archivoEscribir << linea << endl; 
+        }
+        archivoLeer.close();
+        archivoEscribir.close();
+        cout << "El archivo cifrado se ha guardado en: " << archivoSalida << endl;
+    } else {
+        cout << "No se pudo abrir uno de los archivos." << endl;
+    }
 }
